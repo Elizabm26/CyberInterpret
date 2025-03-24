@@ -1,1 +1,50 @@
-<h1>Reporte</h1>
+<div #reportContent class="report-container">
+    <h2>📄 Reporte de Análisis</h2>
+  
+    <!-- Sección de Resumen -->
+    <div class="summary">
+      <div class="card">
+        <h3>Total de Evaluaciones</h3>
+        <p>{{ totalEvaluaciones }}</p>
+      </div>
+      <div class="card">
+        <h3>Seguridad Cumplida</h3>
+        <p>{{ cumplimiento }}%</p>
+      </div>
+      <div class="card">
+        <h3>Riesgos Detectados</h3>
+        <p>{{ riesgos }}</p>
+      </div>
+    </div>
+  
+    <!-- Tabla de Resultados -->
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Categoría</th>
+          <th>Resultado</th>
+          <th>Riesgo</th>
+          <th>Acción Recomendada</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of reportes; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ item.categoria }}</td>
+          <td>{{ item.resultado }}</td>
+          <td [ngClass]="getRiskClass(item.riesgo)">{{ item.riesgo }}</td>
+          <td>{{ item.recomendacion }}</td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Gráfico de Cumplimiento -->
+    <div class="chart-container">
+      <canvas #reportChart></canvas>
+    </div>
+  </div>
+  
+  <!-- Botón de Exportación -->
+  <button class="export-btn" (click)="exportToPDF()">📥 Exportar PDF</button>
+  

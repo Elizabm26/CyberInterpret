@@ -1,7 +1,51 @@
-<h1>Dashboard</h1>
-<div class="card">
-    <div class="card-head">Lorem ipsum - dashboard</div>
-    <div class="card-body">
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quas ducimus soluta, quasi aut ipsa non, ullam enim rem repudiandae, vitae provident animi. Inventore rerum, voluptas optio dignissimos blanditiis modi illo!
+<div class="dashboard-container">
+  <h2>Bienvenido a CyberInterpret</h2>
+
+    <!-- Botón para redirigir a Feasibility Cybersecurity -->
+    <button class="redirect-button" (click)="redirectToFeasibility()">Ir a Feasibility Cybersecurity</button>
+
+  <div class="dashboard-grid">
+    <!-- Resumen de la Herramienta -->
+    <div class="card">
+      <h3>📌 Información General</h3>
+      <p>{{ toolInfo }}</p>
     </div>
+
+    <!-- Estado de los Módulos -->
+    <div class="card">
+      <h3>⚙️ Estado de los Módulos</h3>
+      <ul>
+        <li *ngFor="let module of modulesStatus">
+          <span class="material-icons">{{ module.icon }}</span>
+          <span>{{ module.name }}</span>
+          <span class="status" [class.active]="module.status === 'Activo'">{{ module.status }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Últimos Archivos Subidos -->
+    <div class="card">
+      <h3>📂 Últimos Archivos</h3>
+      <ul>
+        <li *ngFor="let file of recentFiles">{{ file.name }} - {{ file.date }}</li>
+      </ul>
+    </div>
+
+    <!-- Estado de Análisis -->
+    <div class="card chart-container">
+      <h3>📊 Resumen de Resultados</h3>
+      <canvas #doughnutCanvas></canvas>
+    </div>
+
+    <!-- Notificaciones -->
+    <div class="card">
+      <h3>🔔 Notificaciones</h3>
+      <ul>
+        <li *ngFor="let notification of notifications">
+          <span>{{ notification.message }}</span>
+          <small>{{ notification.date }}</small>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>

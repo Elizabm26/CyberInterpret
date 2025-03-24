@@ -1,1 +1,14 @@
 <h1>Cargar Archivo</h1>
+<div class="upload-container" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
+    <p>Drag a file here</p>
+    <p>Or, if you prefer...</p>
+    <button (click)="fileInput.click()">Select a file from your computer</button>
+    <input #fileInput type="file" (change)="onFileSelected($event)" hidden />
+   </div>
+<p *ngIf="message">{{ message }}</p>
+ <!-- Nuevo botón para analizar -->
+  <div>
+    <button class="analyze-btn" (click)="analyzeFile()" [disabled]="!fileUploaded">Analyze Document</button>
+  </div>
+
+

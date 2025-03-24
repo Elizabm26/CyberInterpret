@@ -1,0 +1,49 @@
+.help-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+  
+    h2 {
+      text-align: center;
+      color: #007bff;
+    }
+  
+    .section {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  
+      h3 {
+        color: #333;
+        margin-bottom: 8px;
+      }
+  
+      ul {
+        padding-left: 20px;
+      }
+    }
+  
+    details {
+      margin-top: 10px;
+      cursor: pointer;
+  
+      summary {
+        font-weight: bold;
+        color: #0056b3;
+      }
+  
+      p {
+        margin-top: 5px;
+      }
+    }
+  
+    .contact {
+      text-align: center;
+      background: #d1ecf1;
+      padding: 10px;
+      border-radius: 8px;
+    }
+  }
+  

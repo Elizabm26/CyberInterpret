@@ -8,14 +8,14 @@ export const navbarData = [
     {
         routeLink: 'cargar-archivo',
         icon: 'fal fa-cloud-upload',
-        label: 'Cargar Archivo'
+        label: 'Interpretar Documento'
     },
     {
         routeLink: 'visualizacion',
         icon: 'fal fa-chart-area',
-        label: 'Visualización'
+        label: 'Gestionar Información'
     },
-    {
+   /* {
         routeLink: 'reporte',
         icon: 'fal fa-file',
         label: 'Reporte'
@@ -24,5 +24,5 @@ export const navbarData = [
         routeLink: 'ayuda',
         icon: 'fal fa-cog',
         label: 'Ayuda'
-    },
+    },*/
 ];

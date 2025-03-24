@@ -1,0 +1,103 @@
+$primary-color: #007bff;
+$border-color: #ccc;
+$hover-color: darken($primary-color, 10%);
+$error-color: #dc3545;
+$success-color: #28a745;
+
+.upload-container {
+  border: 3px dashed $border-color;
+  border-radius: 20px;
+  padding: 50px;
+  text-align: center;
+  width: 80%;
+  max-width: 800px;
+  height: 300px;
+  margin: 40px auto;
+  cursor: pointer;
+  transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  background-color: rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    border-color: $primary-color;
+    background-color: rgba(0, 123, 255, 0.1);
+  }
+
+  p {
+    font-size: 20px;
+    color: #555;
+    margin: 10px 0;
+  }
+
+  button {
+    background-color: $primary-color;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: $hover-color;
+    }
+  }
+}
+
+.upload-success {
+  color: $success-color;
+  font-size: 18px;
+  margin-top: 15px;
+}
+
+.upload-error {
+  color: $error-color;
+  font-size: 18px;
+  margin-top: 15px;
+}
+
+// Estilos responsivos
+@media (max-width: 768px) {
+  .upload-container {
+    width: 90%;
+    height: 250px;
+    padding: 30px;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px 0;
+  }
+
+  p {
+    font-size: 16px;
+  }
+}
+.analyze-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+  
+    &:hover {
+      background-color: darken(#28a745, 10%);
+    }
+  
+    &:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  }
+  

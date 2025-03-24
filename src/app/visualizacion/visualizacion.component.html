@@ -1,1 +1,47 @@
-<h1>Visualización</h1>
+<div #reportContent class="visualizacion-container">
+  <!-- Información del Archivo -->
+  <div class="file-info">
+    <h2>📂 Archivo: {{ fileInfo.name }}</h2>
+    <p><strong>Fecha:</strong> {{ fileInfo.date }}</p>
+    <p><strong>Tamaño:</strong> {{ fileInfo.size }}</p>
+    <p><strong>Estado:</strong> {{ fileInfo.status }}</p>
+  </div>
+
+  <!-- Resumen Narrativo -->
+  <div class="summary">
+    <h3>📌 Resumen del Análisis</h3>
+    <p>{{ summary }}</p>
+  </div>
+
+  <!-- Sección de Gráficos -->
+  <div class="charts">
+    <div class="chart">
+      <h3>📊 Cumplimiento por Categoría</h3>
+      <canvas #barChart></canvas>
+    </div>
+    <div class="chart">
+      <h3>📝 Estado General</h3>
+      <canvas #pieChart></canvas>
+    </div>
+  </div>
+
+  <!-- Sección de Alertas -->
+  <div class="alerts">
+    <h3>⚠️ Alertas y Recomendaciones</h3>
+    <ul>
+      <li *ngFor="let alert of alerts">
+        <span class="badge" [ngClass]="{'high': alert.type === 'Alto', 'medium': alert.type === 'Medio', 'low': alert.type === 'Bajo'}">{{ alert.type }}</span>
+        <span>{{ alert.message }}</span>
+        <small>{{ alert.date }}</small>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Botón de Exportación 
+<button class="export-btn" (click)="exportToPDF()">📥 Exportar PDF</button> -->
+<div class="export-container">
+  <button class="export-btn" (click)="exportToPDF()">
+    <i class="fas fa-file-download"></i> Exportar Reporte
+  </button>
+</div>
