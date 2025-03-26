@@ -101,3 +101,52 @@ $success-color: #28a745;
     }
   }
   
+
+  .card {
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    width: 90%;
+    max-width: 600px;
+    background-color: #fff;
+
+    .card-header {
+      background-color: $primary-color;
+      color: #fff;
+      padding: 15px;
+      font-size: 20px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+
+    .card-body {
+      padding: 20px;
+      font-size: 16px;
+      color: #333;
+
+      .card-text {
+        margin-bottom: 15px;
+
+        strong {
+          font-weight: 600;
+        }
+
+        a {
+          color: $primary-color;
+          text-decoration: none;
+          transition: color 0.3s;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .card {
+      width: 95%;
+    }
+  }
