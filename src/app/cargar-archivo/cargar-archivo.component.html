@@ -29,5 +29,8 @@
 <p *ngIf="message">{{ message }}</p>
 <!-- Nuevo botón para analizar -->
 <div>
+  <div *ngIf="isAnalyzing" class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
   <button class="analyze-btn" (click)="analyzeFile()" [disabled]="!fileUploaded">Analyze Document</button>
 </div>

@@ -2,6 +2,8 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import Chart from 'chart.js/auto';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { ActivatedRoute } from '@angular/router';
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 
 
 @Component({
@@ -10,6 +12,9 @@ import html2canvas from 'html2canvas';
   styleUrls: ['./visualizacion.component.scss']
 })
 export class VisualizacionComponent implements OnInit {
+  id: string = '';
+  itemDoc!: AngularFirestoreDocument<any>;
+
   fileInfo = {
     name: 'reporte_seguridad.json',
     date: '2025-02-10',
@@ -29,9 +34,23 @@ export class VisualizacionComponent implements OnInit {
   @ViewChild('pieChart', { static: true }) pieChart!: ElementRef;
   @ViewChild('reportContent') reportContent!: ElementRef;
 
-  constructor() {}
+  constructor(
+    private _route: ActivatedRoute,
+    private _afs: AngularFirestore,
+  ) {
+
+
+  }
 
   ngOnInit() {
+    this.id = this._route.snapshot.paramMap.get('id')!;
+
+    this.itemDoc = this._afs.doc<any>(`analysis/${this.id}`);
+    this.itemDoc.valueChanges().subscribe(data => {
+      console.log(data);
+    });
+
+    console.log(this.id);
     this.loadBarChart();
     this.loadPieChart();
   }
@@ -51,14 +70,14 @@ export class VisualizacionComponent implements OnInit {
       },
       options: {
         responsive: true,
-      maintainAspectRatio: false, // Permite que se ajuste mejor
-      plugins: {
-        legend: { display: false } // Oculta la leyenda para ahorrar espacio
-      },
-      scales: {
-        y: { beginAtZero: true, max: 100 }
+        maintainAspectRatio: false, // Permite que se ajuste mejor
+        plugins: {
+          legend: { display: false } // Oculta la leyenda para ahorrar espacio
+        },
+        scales: {
+          y: { beginAtZero: true, max: 100 }
+        }
       }
-    }
     });
   }
 
@@ -86,29 +105,29 @@ export class VisualizacionComponent implements OnInit {
   // Método para exportar el reporte completo a PDF
   exportToPDF() {
     const doc = new jsPDF('p', 'mm', 'a4');
-  
+
     // Captura la pantalla del reporte
     html2canvas(this.reportContent.nativeElement, { scale: 2 }).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = 190;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let yPos = 20; // Margen superior
-  
+
       // Agregar título y encabezado
       doc.setFontSize(18);
       doc.text('Reporte de Seguridad', 14, yPos);
       yPos += 10;
-      
+
       // Agregar imagen del contenido capturado
       if (imgHeight > 240) {
         const pageHeight = doc.internal.pageSize.height - 20;
         let heightLeft = imgHeight;
-  
+
         while (heightLeft > 0) {
           doc.addImage(imgData, 'PNG', 10, yPos, imgWidth, imgHeight);
           heightLeft -= pageHeight;
           yPos = -pageHeight;
-  
+
           if (heightLeft > 0) {
             doc.addPage();
           }
@@ -116,14 +135,14 @@ export class VisualizacionComponent implements OnInit {
       } else {
         doc.addImage(imgData, 'PNG', 10, yPos, imgWidth, imgHeight);
       }
-  
+
       // Pie de página
       doc.setFontSize(10);
       doc.text('CyberInterpret - Reporte generado automáticamente', 14, 285);
-  
+
       // Guardar el PDF
       doc.save('reporte_seguridad.pdf');
     });
   }
-  
+
 }

@@ -7,12 +7,12 @@ import { ReporteComponent } from './reporte/reporte.component';
 import { AyudaComponent } from './ayuda/ayuda.component';
 
 const routes: Routes = [
-  {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
-  {path: 'dashboard', component: DashboardComponent}, 
-  {path:'cargar-archivo', component: CargarArchivoComponent},
-  {path:'visualizacion', component: VisualizacionComponent},
-  {path: 'reporte', component: ReporteComponent},
-  {path:'ayuda', component: AyudaComponent} 
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'cargar-archivo', component: CargarArchivoComponent },
+  { path: 'visualizacion/:id', component: VisualizacionComponent },
+  { path: 'reporte', component: ReporteComponent },
+  { path: 'ayuda', component: AyudaComponent }
 
 ];
 
