@@ -1,16 +1,16 @@
 <div #reportContent class="visualizacion-container">
   <!-- Información del Archivo -->
-  <div class="file-info">
-    <h2>📂 Archivo: {{ fileInfo.name }}</h2>
-    <p><strong>Fecha:</strong> {{ fileInfo.date }}</p>
-    <p><strong>Tamaño:</strong> {{ fileInfo.size }}</p>
+  <div class="file-info" *ngIf="analysis">
+    <h2>📂 Archivo: {{ analysis.name }}</h2>
+    <p><strong>Fecha:</strong> {{ analysis.createdAt | date: 'medium' }}</p>
+    <p><strong>Tamaño:</strong> {{ analysis.size ? (analysis.size / (1024 * 1024) | number: '1.2-2') : 'N/A' }} MB</p>
     <p><strong>Estado:</strong> {{ fileInfo.status }}</p>
   </div>
 
   <!-- Resumen Narrativo -->
-  <div class="summary">
+  <div class="summary" *ngIf="analysis">
     <h3>📌 Resumen del Análisis</h3>
-    <p>{{ summary }}</p>
+    <p>{{ analysis.result.executiveSummary }}</p>
   </div>
 
   <!-- Sección de Gráficos -->
@@ -25,23 +25,35 @@
     </div>
   </div>
 
-  <!-- Sección de Alertas -->
-  <div class="alerts">
+  <!-- Sección de Alertas y Recomendaciones -->
+  <div class="alerts-recommendations" *ngIf="analysis">
     <h3>⚠️ Alertas y Recomendaciones</h3>
-    <ul>
-      <li *ngFor="let alert of alerts">
-        <span class="badge" [ngClass]="{'high': alert.type === 'Alto', 'medium': alert.type === 'Medio', 'low': alert.type === 'Bajo'}">{{ alert.type }}</span>
-        <span>{{ alert.message }}</span>
-        <small>{{ alert.date }}</small>
-      </li>
-    </ul>
-  </div>
-</div>
 
-<!-- Botón de Exportación 
-<button class="export-btn" (click)="exportToPDF()">📥 Exportar PDF</button> -->
-<div class="export-container">
-  <button class="export-btn" (click)="exportToPDF()">
-    <i class="fas fa-file-download"></i> Exportar Reporte
-  </button>
+    <!-- Sección de Alertas -->
+    <div class="alerts-section">
+      <h4>🔴 Alertas Críticas</h4>
+      <div *ngFor="let alert of analysis.result.result.alertasYRecomendaciones.alertas" class="alert-card"
+        [ngClass]="getAlertClass(alert)">
+        <i class="fas" [ngClass]="getAlertIcon(alert)"></i>
+        <span>{{ alert }}</span>
+      </div>
+    </div>
+
+    <!-- Sección de Recomendaciones -->
+    <div class="recommendations-section">
+      <h4>📋 Recomendaciones</h4>
+      <div *ngFor="let recommendation of analysis.result.result.alertasYRecomendaciones.recomendaciones"
+        class="recommendation-card">
+        <i class="fas fa-check-circle"></i>
+        <span>{{ recommendation }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón de Exportación -->
+  <div class="export-container">
+    <button class="export-btn" (click)="exportToPDF()">
+      <i class="fas fa-file-download"></i> Exportar Reporte
+    </button>
+  </div>
 </div>
