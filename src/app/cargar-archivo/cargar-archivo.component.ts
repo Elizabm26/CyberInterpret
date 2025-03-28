@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 export interface Analysis {
   id: string;
   name: string;
+  size: number;
   fileURL: string;
   createdAt: string;
   result?: any;
@@ -58,9 +59,11 @@ export class CargarArchivoComponent implements OnInit {
 
         lastValueFrom(fileRef.getDownloadURL()).then((url: string) => {
           const id = this.afs.createId();
+
           const data: Analysis = {
             id: id,
             name: file.name,
+            size: file.size,
             fileURL: url,
             createdAt: new Date().toISOString()
           };

@@ -5,6 +5,64 @@ import html2canvas from 'html2canvas';
 import { ActivatedRoute } from '@angular/router';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 
+export interface AnalysisView {
+  name: string;
+  createdAt: string;
+  size: number;
+  fileURL: string;
+  result: {
+    breach: string;
+    title: string;
+    result: {
+      respond: {
+        nivel: number;
+        cumple: number;
+        description: string;
+        noCumple: number;
+        parcial: number;
+      };
+      protect: {
+        noCumple: number;
+        description: string;
+        cumple: number;
+        parcial: number;
+        nivel: number;
+      };
+      estadoGeneral: {
+        noCumple: number;
+        cumple: number;
+        parcial: number;
+      };
+      alertasYRecomendaciones: {
+        alertas: string[];
+        recomendaciones: string[];
+      };
+      detect: {
+        noCumple: number;
+        nivel: number;
+        parcial: number;
+        description: string;
+        cumple: number;
+      };
+      recover: {
+        parcial: number;
+        noCumple: number;
+        nivel: number;
+        description: string;
+        cumple: number;
+      };
+      identify: {
+        noCumple: number;
+        nivel: number;
+        parcial: number;
+        cumple: number;
+        description: string;
+      };
+    };
+    executiveSummary: string;
+  };
+  id: string;
+}
 
 @Component({
   selector: 'app-visualizacion',
@@ -14,6 +72,7 @@ import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat
 export class VisualizacionComponent implements OnInit {
   id: string = '';
   itemDoc!: AngularFirestoreDocument<any>;
+  analysis!: AnalysisView;
 
   fileInfo = {
     name: 'reporte_seguridad.json',
@@ -37,42 +96,44 @@ export class VisualizacionComponent implements OnInit {
   constructor(
     private _route: ActivatedRoute,
     private _afs: AngularFirestore,
-  ) {
-
-
-  }
+  ) { }
 
   ngOnInit() {
     this.id = this._route.snapshot.paramMap.get('id')!;
 
-    this.itemDoc = this._afs.doc<any>(`analysis/${this.id}`);
+    this.itemDoc = this._afs.doc<AnalysisView>(`analysis/${this.id}`);
     this.itemDoc.valueChanges().subscribe(data => {
       console.log(data);
+      this.analysis = data;
+      this.loadBarChart();
+      this.loadPieChart();
     });
 
     console.log(this.id);
-    this.loadBarChart();
-    this.loadPieChart();
   }
 
   loadBarChart() {
+    const respond = this.analysis.result.result.respond.nivel * 100;
+    const protect = this.analysis.result.result.protect.nivel * 100;
+    const detect = this.analysis.result.result.detect.nivel * 100;
+
     new Chart(this.barChart.nativeElement, {
       type: 'bar',
       data: {
-        labels: ['Autenticación', 'Red', 'Cifrado', 'Logs', 'Accesos'],
+        labels: ['Respond', 'Protect', 'Detect'],
         datasets: [
           {
             label: 'Cumplimiento (%)',
-            data: [80, 65, 75, 50, 60],
-            backgroundColor: ['#28a745', '#ffc107', '#007bff', '#dc3545', '#17a2b8']
+            data: [respond, protect, detect],
+            backgroundColor: ['#28a745', '#ffc107', '#007bff']
           }
         ]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false, // Permite que se ajuste mejor
+        maintainAspectRatio: false,
         plugins: {
-          legend: { display: false } // Oculta la leyenda para ahorrar espacio
+          legend: { display: false }
         },
         scales: {
           y: { beginAtZero: true, max: 100 }
@@ -82,13 +143,17 @@ export class VisualizacionComponent implements OnInit {
   }
 
   loadPieChart() {
+    const cumple = this.analysis.result.result.estadoGeneral.cumple * 100;
+    const parcial = this.analysis.result.result.estadoGeneral.parcial * 100;
+    const noCumple = this.analysis.result.result.estadoGeneral.noCumple * 100;
+
     new Chart(this.pieChart.nativeElement, {
       type: 'pie',
       data: {
         labels: ['Cumple', 'Parcial', 'No Cumple'],
         datasets: [
           {
-            data: [70, 20, 10],
+            data: [cumple, parcial, noCumple],
             backgroundColor: ['#28a745', '#ffc107', '#dc3545']
           }
         ]
@@ -97,12 +162,33 @@ export class VisualizacionComponent implements OnInit {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'bottom' } // Mueve la leyenda debajo para ahorrar espacio
+          legend: { position: 'bottom' }
         }
       }
     });
   }
-  // Método para exportar el reporte completo a PDF
+
+  getAlertClass(alert: string): string {
+    if (alert.includes('Crítica')) {
+      return 'high';
+    } else if (alert.includes('Medio')) {
+      return 'medium';
+    } else {
+      return 'low';
+    }
+  }
+
+  getAlertIcon(alert: string): string {
+    if (alert.includes('Crítica')) {
+      return 'fa-exclamation-triangle'; // Ícono de alerta crítica
+    } else if (alert.includes('Medio')) {
+      return 'fa-exclamation-circle'; // Ícono de alerta media
+    } else {
+      return 'fa-info-circle'; // Ícono de alerta baja
+    }
+  }
+
+
   exportToPDF() {
     const doc = new jsPDF('p', 'mm', 'a4');
 
@@ -144,5 +230,4 @@ export class VisualizacionComponent implements OnInit {
       doc.save('reporte_seguridad.pdf');
     });
   }
-
 }

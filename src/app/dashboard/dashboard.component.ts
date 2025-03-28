@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import Chart from 'chart.js/auto';
 import { Observable } from 'rxjs';
+import { AnalysisView } from '../visualizacion/visualizacion.component';
 
 export interface Item { name: string };
 
@@ -12,8 +13,8 @@ export interface Item { name: string };
 })
 export class DashboardComponent implements OnInit {
 
-  private ItemsCollection!: AngularFirestoreCollection<Item>;
-  items!: Observable<Item[]>;
+  private analysisViewCollection!: AngularFirestoreCollection<AnalysisView>;
+  analysisView!: Observable<AnalysisView[]>;
 
   toolInfo: string = 'CyberInterpret analiza archivos de seguridad generados por Feasibility Cybersecurity, detecta riesgos y genera reportes detallados.';
 
@@ -44,8 +45,8 @@ export class DashboardComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.ItemsCollection = this.afs.collection<Item>('items');
-    this.items = this.ItemsCollection.valueChanges();
+    this.analysisViewCollection = this.afs.collection<AnalysisView>('analysis');
+    this.analysisView = this.analysisViewCollection.valueChanges();
     this.loadChart();
   }
 

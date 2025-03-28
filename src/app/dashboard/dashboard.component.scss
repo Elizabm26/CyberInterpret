@@ -101,3 +101,11 @@
   }
   
 }
+
+
+.analysis-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  gap: 12px;
+}
