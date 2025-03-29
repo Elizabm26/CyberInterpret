@@ -72,7 +72,6 @@ export interface AnalysisView {
 })
 export class VisualizacionComponent implements OnInit {
   id: string = '';
-  // itemDoc!: AngularFirestoreDocument<any>;
   analysis!: AnalysisView;
 
   fileInfo = {
@@ -111,16 +110,6 @@ export class VisualizacionComponent implements OnInit {
 
       }
     })
-
-    // this.itemDoc = this._afs.doc<AnalysisView>(`analysis/${this.id}`);
-    // this.itemDoc.valueChanges().subscribe(data => {
-    //   console.log(data);
-    //   this.analysis = data;
-    //   this.loadBarChart();
-    //   this.loadPieChart();
-    // });
-
-    console.log(this.id);
   }
 
   loadBarChart() {

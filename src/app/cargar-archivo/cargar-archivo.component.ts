@@ -27,6 +27,7 @@ export class CargarArchivoComponent implements OnInit {
   downloadURL!: string;
   file!: File;
   document!: Analysis;
+  isUpload: boolean = false;
   isAnalyzing: boolean = false;
 
 
@@ -80,66 +81,14 @@ export class CargarArchivoComponent implements OnInit {
         })
       }
     )
+    this.isUpload = true;
     uploadBytes(mountainRef, file).then((snapshot) => {
       console.log('Uploaded a blob or file!');
-
+      this.isUpload = false;
     })
-
-    // const fileRef = this.storage.ref(filePath);
-    // const task = fileRef.put(file);
-    // this.uploadPercent = task.percentageChanges();
-    // task.snapshotChanges().pipe(
-    //   finalize(() => {
-    //     this.downloadURL = fileRef.getDownloadURL();
-
-    //     lastValueFrom(fileRef.getDownloadURL()).then((url) => {
-
-
-    //       const data: Analysis = {
-    //         name: file.name,
-    //         size: file.size,
-    //         fileURL: url,
-    //         createdAt: new Date().toISOString()
-    //       };
-
-    //       addDoc(collection(db, 'analysis'), data)
-    //         .then(docRef => {
-    //           console.log("Documento guardado con ID: ", docRef.id);
-    //           this.document = data;
-    //           this.document.id = docRef.id;
-    //         })
-    //         .catch(err => {
-    //           console.log('Error: ', err);
-    //         })
-
-    //       this.fileUploaded = true;
-    //     });
-
-    //   })
-    // ).subscribe()
-
   }
 
-  // onFileSelected(event: any) {
-  //   debugger;
-  //   const file: File = event?.target.files[0];
-  //   if (file) {
-  //     this.uploadFile(file);
-  //   }
 
-  //   const id = this.afs.createId()
-
-  //   const data: Analysis = {
-  //     id: id,
-  //     name: file.name,
-  //     fileURL: `http://localhost/files/${file.name}`,
-  //     createdAt: new Date().toISOString()
-  //   };
-
-  //   // Guardamos los datos.
-  //   this.analysisCollection.doc(id).set(data);
-
-  // }
 
   onDrop(event: DragEvent) {
     event.preventDefault();
@@ -279,12 +228,7 @@ export class CargarArchivoComponent implements OnInit {
         const docRef = doc(db, 'analysis', this.document.id!);
         setDoc(docRef, { result: resultParsed }, { merge: true }).then(() => {
           this._router.navigate(['visualizacion', this.document.id]);
-        })
-
-        // this.analysisCollection.doc(this.document.id).set(this.document, { merge: true }).then(() => {
-        //   console.log('Felicidades tu análisis esta completado');
-        //   this._router.navigate(['visualizacion', this.document.id]);
-        // });
+        });
 
       } catch (error) {
         console.error('Error during analysis:', error);
