@@ -28,7 +28,7 @@
       <h3>📂 Últimos Archivos</h3>
       <ul>
         <!-- <li *ngFor="let file of recentFiles">{{ file.name }} - {{ file.date }}</li> -->
-        <div *ngFor="let item of analysisView | async" class="analysis-item">
+        <div *ngFor="let item of analysisView" class="analysis-item">
           <div>
             {{ item.name }}
           </div>

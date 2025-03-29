@@ -3,7 +3,8 @@ import Chart from 'chart.js/auto';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ActivatedRoute } from '@angular/router';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export interface AnalysisView {
   name: string;
@@ -71,7 +72,7 @@ export interface AnalysisView {
 })
 export class VisualizacionComponent implements OnInit {
   id: string = '';
-  itemDoc!: AngularFirestoreDocument<any>;
+  // itemDoc!: AngularFirestoreDocument<any>;
   analysis!: AnalysisView;
 
   fileInfo = {
@@ -95,19 +96,29 @@ export class VisualizacionComponent implements OnInit {
 
   constructor(
     private _route: ActivatedRoute,
-    private _afs: AngularFirestore,
   ) { }
 
   ngOnInit() {
     this.id = this._route.snapshot.paramMap.get('id')!;
 
-    this.itemDoc = this._afs.doc<AnalysisView>(`analysis/${this.id}`);
-    this.itemDoc.valueChanges().subscribe(data => {
-      console.log(data);
-      this.analysis = data;
-      this.loadBarChart();
-      this.loadPieChart();
-    });
+    const docRef = doc(db, 'analysis', this.id);
+    getDoc(docRef).then(doc => {
+      if (doc.exists()) {
+        console.log(doc.data());
+        this.analysis = doc.data() as any;
+        this.loadBarChart();
+        this.loadPieChart();
+
+      }
+    })
+
+    // this.itemDoc = this._afs.doc<AnalysisView>(`analysis/${this.id}`);
+    // this.itemDoc.valueChanges().subscribe(data => {
+    //   console.log(data);
+    //   this.analysis = data;
+    //   this.loadBarChart();
+    //   this.loadPieChart();
+    // });
 
     console.log(this.id);
   }

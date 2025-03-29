@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { finalize, lastValueFrom, Observable } from 'rxjs';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { app } from '../firebase';
+import { Observable } from 'rxjs';
+import { app, db, storage } from '../firebase';
 import { getGenerativeModel, getVertexAI, Schema } from 'firebase/vertexai';
 import { Router } from '@angular/router';
+import { getDownloadURL, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 
 export interface Analysis {
-  id: string;
+  id?: string;
   name: string;
   size: number;
   fileURL: string;
@@ -23,21 +23,17 @@ export interface Analysis {
 export class CargarArchivoComponent implements OnInit {
   message: string = '';
   fileUploaded: boolean = false;
-  uploadPercent!: Observable<number | undefined>;
-  downloadURL!: Observable<string>;
+  uploadPercent!: number | undefined;
+  downloadURL!: string;
   file!: File;
   document!: Analysis;
   isAnalyzing: boolean = false;
 
-  private analysisCollection: AngularFirestoreCollection<Analysis>;
-
 
   constructor(
-    private storage: AngularFireStorage,
-    private afs: AngularFirestore,
     private _router: Router,
   ) {
-    this.analysisCollection = afs.collection<Analysis>('analysis');
+
   }
 
   ngOnInit(): void { }
@@ -50,31 +46,77 @@ export class CargarArchivoComponent implements OnInit {
     this.file = file;
 
     const filePath = file.name;
-    const fileRef = this.storage.ref(filePath);
-    const task = fileRef.put(file);
-    this.uploadPercent = task.percentageChanges();
-    task.snapshotChanges().pipe(
-      finalize(() => {
-        this.downloadURL = fileRef.getDownloadURL();
-
-        lastValueFrom(fileRef.getDownloadURL()).then((url: string) => {
-          const id = this.afs.createId();
-
+    const mountainRef = ref(storage, file.name);
+    const uploadTask = uploadBytesResumable(mountainRef, file);
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        this.uploadPercent = progress;
+      },
+      (error) => { },
+      () => {
+        getDownloadURL(mountainRef).then(url => {
+          console.log('URL: ', url);
+          this.downloadURL = url;
           const data: Analysis = {
-            id: id,
             name: file.name,
             size: file.size,
             fileURL: url,
             createdAt: new Date().toISOString()
           };
-          this.analysisCollection.doc(id).set(data).then(() => {
-            this.document = data;
-          });
-          this.fileUploaded = true;
-        });
 
-      })
-    ).subscribe()
+          addDoc(collection(db, 'analysis'), data)
+            .then(docRef => {
+              console.log("Documento guardado con ID: ", docRef.id);
+              this.document = data;
+              this.document.id = docRef.id;
+            })
+            .catch(err => {
+              console.log('Error: ', err);
+            })
+            .finally(() => {
+              this.fileUploaded = true;
+            })
+        })
+      }
+    )
+    uploadBytes(mountainRef, file).then((snapshot) => {
+      console.log('Uploaded a blob or file!');
+
+    })
+
+    // const fileRef = this.storage.ref(filePath);
+    // const task = fileRef.put(file);
+    // this.uploadPercent = task.percentageChanges();
+    // task.snapshotChanges().pipe(
+    //   finalize(() => {
+    //     this.downloadURL = fileRef.getDownloadURL();
+
+    //     lastValueFrom(fileRef.getDownloadURL()).then((url) => {
+
+
+    //       const data: Analysis = {
+    //         name: file.name,
+    //         size: file.size,
+    //         fileURL: url,
+    //         createdAt: new Date().toISOString()
+    //       };
+
+    //       addDoc(collection(db, 'analysis'), data)
+    //         .then(docRef => {
+    //           console.log("Documento guardado con ID: ", docRef.id);
+    //           this.document = data;
+    //           this.document.id = docRef.id;
+    //         })
+    //         .catch(err => {
+    //           console.log('Error: ', err);
+    //         })
+
+    //       this.fileUploaded = true;
+    //     });
+
+    //   })
+    // ).subscribe()
 
   }
 
@@ -232,12 +274,17 @@ export class CargarArchivoComponent implements OnInit {
 
         const result = await model.generateContent([prompt, imagePart]);
         const resultParsed = JSON.parse(result.response.text());
-        console.log(resultParsed);
+
         this.document.result = resultParsed;
-        this.analysisCollection.doc(this.document.id).set(this.document, { merge: true }).then(() => {
-          console.log('Felicidades tu análisis esta completado');
+        const docRef = doc(db, 'analysis', this.document.id!);
+        setDoc(docRef, { result: resultParsed }, { merge: true }).then(() => {
           this._router.navigate(['visualizacion', this.document.id]);
-        });
+        })
+
+        // this.analysisCollection.doc(this.document.id).set(this.document, { merge: true }).then(() => {
+        //   console.log('Felicidades tu análisis esta completado');
+        //   this._router.navigate(['visualizacion', this.document.id]);
+        // });
 
       } catch (error) {
         console.error('Error during analysis:', error);

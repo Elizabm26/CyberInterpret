@@ -13,13 +13,13 @@
   <div class="card-body">
     <p class="card-text">
       <strong>Progreso de subida:</strong>
-      <span *ngIf="uploadPercent | async as percent; else noUpload">{{ percent }}%</span>
+      <span *ngIf="uploadPercent; else noUpload">{{ uploadPercent }}%</span>
       <ng-template #noUpload>No hay información de subida.</ng-template>
     </p>
     <p class="card-text">
       <strong>URL de descarga:</strong>
-      <span *ngIf="downloadURL | async as url; else noUrl">
-        <a [href]="url" target="_blank">{{ url }}</a>
+      <span *ngIf="downloadURL; else noUrl">
+        <a [href]="downloadURL" target="_blank">{{ downloadURL }}</a>
       </span>
       <ng-template #noUrl>No hay URL disponible.</ng-template>
     </p>
