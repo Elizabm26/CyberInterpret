@@ -1,8 +1,9 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import Chart from 'chart.js/auto';
 import { Observable } from 'rxjs';
 import { AnalysisView } from '../visualizacion/visualizacion.component';
+import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export interface Item { name: string };
 
@@ -13,15 +14,14 @@ export interface Item { name: string };
 })
 export class DashboardComponent implements OnInit {
 
-  private analysisViewCollection!: AngularFirestoreCollection<AnalysisView>;
-  analysisView!: Observable<AnalysisView[]>;
+  analysisView: AnalysisView[] = [];
 
   toolInfo: string = 'CyberInterpret analiza archivos de seguridad generados por Feasibility Cybersecurity, detecta riesgos y genera reportes detallados.';
 
   modulesStatus = [
     { name: 'Carga de Archivos', status: 'Activo', icon: 'upload' },
     { name: 'Visualización de Datos', status: 'Activo', icon: 'bar_chart' },
-    { name: 'Generación de Reportes', status: 'Pendiente', icon: 'article' },
+    { name: 'Generación de Reportes', status: 'Activo', icon: 'article' },
     { name: 'Motor de Análisis', status: 'Activo', icon: 'analytics' }
   ];
 
@@ -41,12 +41,18 @@ export class DashboardComponent implements OnInit {
   doughnutChart: any;
 
   constructor(
-    private afs: AngularFirestore,
   ) { }
 
   ngOnInit() {
-    this.analysisViewCollection = this.afs.collection<AnalysisView>('analysis');
-    this.analysisView = this.analysisViewCollection.valueChanges();
+    const ref = query(collection(db, 'analysis'), limit(5), orderBy('createdAt', 'desc'))
+    getDocs(ref).then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        let data: AnalysisView;
+        data = doc.data() as AnalysisView;
+        data.id = doc.id;
+        this.analysisView.push(data);
+      })
+    })
     this.loadChart();
   }
 

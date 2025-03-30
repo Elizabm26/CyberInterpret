@@ -1,14 +1,38 @@
 <div class="dashboard-container">
-  <h2>Bienvenido a CyberInterpret</h2>
+  <div class="dashboard-header">
+    <div class="text-2xl">Bienvenido a CyberInterpret</div>
 
-  <!-- Botón para redirigir a Feasibility Cybersecurity -->
-  <button class="redirect-button" (click)="redirectToFeasibility()">Ir a Feasibility Cybersecurity</button>
+    <!-- Botón para redirigir a Feasibility Cybersecurity -->
+    <button class="redirect-button" (click)="redirectToFeasibility()">Ir a Feasibility Cybersecurity</button>
+  </div>
 
   <div class="dashboard-grid">
     <!-- Resumen de la Herramienta -->
     <div class="card">
-      <h3>📌 Información General</h3>
-      <p>{{ toolInfo }}</p>
+      <div class="title">📌 Información General</div>
+
+      <div class="text-body" style="margin-top: 12px;">{{ toolInfo }}</div>
+
+
+    </div>
+
+    <!-- Últimos Archivos Subidos -->
+    <div class="card">
+      <h3>📂 Últimos 5 análisis</h3>
+      <div class="list-analysis">
+        <!-- <li *ngFor="let file of recentFiles">{{ file.name }} - {{ file.date }}</li> -->
+        <div *ngFor="let item of analysisView" class="analysis-item">
+          <div>
+            <div class="text-lg">
+              {{ item.name }}
+            </div>
+            <div class="text-secondary">
+              {{ item.createdAt | date: 'medium'}}
+            </div>
+          </div>
+          <a class="button-blue" [routerLink]="['/visualizacion', item.id]">Ver análisis</a>
+        </div>
+      </div>
     </div>
 
     <!-- Estado de los Módulos -->
@@ -16,29 +40,13 @@
       <h3>⚙️ Estado de los Módulos</h3>
       <ul>
         <li *ngFor="let module of modulesStatus">
-          <span class="material-icons">{{ module.icon }}</span>
-          <span>{{ module.name }}</span>
+          <div class="text-lg">{{ module.name }}</div>
           <span class="status" [class.active]="module.status === 'Activo'">{{ module.status }}</span>
         </li>
       </ul>
     </div>
 
-    <!-- Últimos Archivos Subidos -->
-    <div class="card">
-      <h3>📂 Últimos Archivos</h3>
-      <ul>
-        <!-- <li *ngFor="let file of recentFiles">{{ file.name }} - {{ file.date }}</li> -->
-        <div *ngFor="let item of analysisView | async" class="analysis-item">
-          <div>
-            {{ item.name }}
-          </div>
-          <div>
-            {{ item.createdAt | date: 'medium'}}
-          </div>
-          <a [routerLink]="['/visualizacion', item.id]">Ver análisis</a>
-        </div>
-      </ul>
-    </div>
+
 
     <!-- Estado de Análisis -->
     <div class="card chart-container">

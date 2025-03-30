@@ -1,10 +1,12 @@
-<h1>Cargar Archivo</h1>
+<div class="text-2xl font-bold mb-4">Subir y analizar documento</div>
+
 <div class="upload-container" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
-  <p>Drag a file here</p>
-  <p>Or, if you prefer...</p>
-  <button (click)="fileInput.click()">Select a file from your computer</button>
+  <p>Arrastra un archivo aquí</p>
+  <p>O, si lo prefieres...</p>
+  <button (click)="fileInput.click()">Selecciona un archivo de tu ordenador</button>
   <input #fileInput type="file" (change)="onFileSelected($event)" hidden />
 </div>
+
 
 <div class="card">
   <div class="card-header">
@@ -13,16 +15,21 @@
   <div class="card-body">
     <p class="card-text">
       <strong>Progreso de subida:</strong>
-      <span *ngIf="uploadPercent | async as percent; else noUpload">{{ percent }}%</span>
+      <span *ngIf="uploadPercent; else noUpload">{{ uploadPercent | number: '1.2-2' }}%</span>
       <ng-template #noUpload>No hay información de subida.</ng-template>
     </p>
     <p class="card-text">
       <strong>URL de descarga:</strong>
-      <span *ngIf="downloadURL | async as url; else noUrl">
-        <a [href]="url" target="_blank">{{ url }}</a>
+      <span *ngIf="downloadURL; else noUrl">
+        <a [href]="downloadURL" target="_blank">{{ downloadURL }}</a>
       </span>
       <ng-template #noUrl>No hay URL disponible.</ng-template>
     </p>
+    <div *ngIf="isUpload" class="drag-over-overlay">
+      <div class="spinner-container">
+        <div class="spinner"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -30,7 +37,12 @@
 <!-- Nuevo botón para analizar -->
 <div>
   <div *ngIf="isAnalyzing" class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Loading...</span>
+    <span class="visually-hidden">Analizando...</span>
+    <div class="drag-over-overlay">
+      <div class="spinner-container">
+        <div class="spinner"></div>
+      </div>
+    </div>
   </div>
   <button class="analyze-btn" (click)="analyzeFile()" [disabled]="!fileUploaded">Analyze Document</button>
 </div>
