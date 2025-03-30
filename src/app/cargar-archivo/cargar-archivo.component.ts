@@ -177,7 +177,8 @@ export class CargarArchivoComponent implements OnInit {
               properties: {
                 cumple: Schema.number({ description: 'Porcentaje de cumplimiento en el reporte', example: '0.1' }),
                 parcial: Schema.number({ description: 'Porcentaje de cumplimiento parcial en el reporte', example: '0.2' }),
-                noCumple: Schema.number({ description: 'Porcentaje de no cumplimiento en el reporte', example: '0.3' })
+                noCumple: Schema.number({ description: 'Porcentaje de no cumplimiento en el reporte', example: '0.3' }),
+                generalDescription: Schema.string({ description: 'Proporciona un resumen claro y conciso sobre el estado general del reporte. Clasifica la información en tres niveles: Se cumple (altos niveles de cumplimiento), Parcialmente (cumplimiento moderado o en proceso) y No se cumple (bajo cumplimiento o ausencia de requisitos). Destaca los aspectos más relevantes y proporciona una visión general sobre las áreas con mejor desempeño y aquellas que requieren atención.' })
               }
             }),
             alertasYRecomendaciones: Schema.object({

@@ -1,10 +1,12 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import Chart from 'chart.js/auto';
 import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
 import { ActivatedRoute } from '@angular/router';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 export interface AnalysisView {
   name: string;
@@ -33,6 +35,7 @@ export interface AnalysisView {
         noCumple: number;
         cumple: number;
         parcial: number;
+        generalDescription: string;
       };
       alertasYRecomendaciones: {
         alertas: string[];
@@ -113,6 +116,8 @@ export class VisualizacionComponent implements OnInit {
   }
 
   loadBarChart() {
+    const recover = this.analysis.result.result.recover.nivel * 100;
+    const identify = this.analysis.result.result.identify.nivel * 100;
     const respond = this.analysis.result.result.respond.nivel * 100;
     const protect = this.analysis.result.result.protect.nivel * 100;
     const detect = this.analysis.result.result.detect.nivel * 100;
@@ -120,25 +125,36 @@ export class VisualizacionComponent implements OnInit {
     new Chart(this.barChart.nativeElement, {
       type: 'bar',
       data: {
-        labels: ['Respond', 'Protect', 'Detect'],
-        datasets: [
-          {
-            label: 'Cumplimiento (%)',
-            data: [respond, protect, detect],
-            backgroundColor: ['#28a745', '#ffc107', '#007bff']
-          }
-        ]
+      labels: ['Identify', 'Recover', 'Respond', 'Protect', 'Detect'],
+      datasets: [
+        {
+        label: 'Cumplimiento (%)',
+        data: [recover, identify, respond, protect, detect],
+        backgroundColor: ['#28a745', '#ffc107', '#007bff', '#dc3545', '#17a2b8']
+        }
+      ]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          y: { beginAtZero: true, max: 100 }
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+        anchor: 'end',
+        align: 'top',
+        color: '#000', // Color de los números
+        formatter: (value) => `${value}%`, // Formato del número
+        font: {
+          weight: 'bold',
+          size: 12
         }
+        }
+      },
+      scales: {
+        y: { beginAtZero: true, max: 100 }
       }
+      },
+      plugins: [ChartDataLabels] // Agregar el plugin para mostrar los valores
     });
   }
 
@@ -146,6 +162,7 @@ export class VisualizacionComponent implements OnInit {
     const cumple = this.analysis.result.result.estadoGeneral.cumple * 100;
     const parcial = this.analysis.result.result.estadoGeneral.parcial * 100;
     const noCumple = this.analysis.result.result.estadoGeneral.noCumple * 100;
+    const generalDescription = this.analysis.result.result.estadoGeneral.generalDescription;
 
     new Chart(this.pieChart.nativeElement, {
       type: 'pie',
@@ -162,7 +179,12 @@ export class VisualizacionComponent implements OnInit {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'bottom' }
+          legend: { position: 'bottom' },
+          tooltip: {
+            callbacks: {
+              afterBody: () => [`Descripción: ${generalDescription}`]
+            }
+          }
         }
       }
     });
@@ -191,9 +213,8 @@ export class VisualizacionComponent implements OnInit {
 
   exportToPDF() {
     const doc = new jsPDF('p', 'mm', 'a4');
-
-    // Captura la pantalla del reporte
-    html2canvas(this.reportContent.nativeElement, { scale: 2 }).then((canvas) => {
+     // Captura la pantalla del reporte
+     html2canvas(this.reportContent.nativeElement, { scale: 2 }).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = 190;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;

@@ -24,7 +24,11 @@
       <canvas #pieChart></canvas>
     </div>
   </div>
-
+  <!-- Descripción del Gráfico Estado General -->
+  <div class="chart-description" *ngIf="analysis">
+    <h4>Descripción del Gráfico Estado General</h4>
+    <p>{{ analysis.result.result.estadoGeneral.generalDescription}}</p>
+  </div>
   <!-- Sección de Alertas y Recomendaciones -->
   <div class="alerts-recommendations" *ngIf="analysis">
     <h3>⚠️ Alertas y Recomendaciones</h3>
