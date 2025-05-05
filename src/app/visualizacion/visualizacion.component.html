@@ -11,6 +11,10 @@
   <div class="summary" *ngIf="analysis">
     <h3>📌 Resumen del Análisis</h3>
     <p>{{ analysis.result.executiveSummary }}</p>
+    <!-- Espacio entre el resumen y el siguiente bloque -->
+      <div style="margin-top: 20px;"></div>
+    <h4>Descripción del Gráfico Estado General</h4>
+    <p>{{ analysis.result.result.estadoGeneral.generalDescription}}</p>
   </div>
 
   <!-- Sección de Gráficos -->
@@ -24,11 +28,11 @@
       <canvas #pieChart></canvas>
     </div>
   </div>
-  <!-- Descripción del Gráfico Estado General -->
+  <!-- Descripción del Gráfico Estado General 
   <div class="chart-description" *ngIf="analysis">
     <h4>Descripción del Gráfico Estado General</h4>
     <p>{{ analysis.result.result.estadoGeneral.generalDescription}}</p>
-  </div>
+  </div> -->
   <!-- Sección de Alertas y Recomendaciones -->
   <div class="alerts-recommendations" *ngIf="analysis">
     <h3>⚠️ Alertas y Recomendaciones</h3>

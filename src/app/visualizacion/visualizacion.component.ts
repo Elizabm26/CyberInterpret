@@ -116,20 +116,20 @@ export class VisualizacionComponent implements OnInit {
   }
 
   loadBarChart() {
-    const recover = this.analysis.result.result.recover.nivel * 100;
-    const identify = this.analysis.result.result.identify.nivel * 100;
-    const respond = this.analysis.result.result.respond.nivel * 100;
+    const identificar = this.analysis.result.result.identify.nivel * 100;    
     const protect = this.analysis.result.result.protect.nivel * 100;
     const detect = this.analysis.result.result.detect.nivel * 100;
+    const respond = this.analysis.result.result.respond.nivel * 100;
+    const recover = this.analysis.result.result.recover.nivel * 100;
 
     new Chart(this.barChart.nativeElement, {
       type: 'bar',
       data: {
-      labels: ['Identify', 'Recover', 'Respond', 'Protect', 'Detect'],
+      labels: ['Identificar', 'Proteger', 'Detectar', 'Responder', 'Recuperar'],
       datasets: [
         {
         label: 'Cumplimiento (%)',
-        data: [recover, identify, respond, protect, detect],
+        data: [identificar, protect, detect, respond, recover],
         backgroundColor: ['#28a745', '#ffc107', '#007bff', '#dc3545', '#17a2b8']
         }
       ]

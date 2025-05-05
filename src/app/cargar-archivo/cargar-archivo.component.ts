@@ -124,11 +124,11 @@ export class CargarArchivoComponent implements OnInit {
     const jsonSchema = Schema.object({
       properties: {
         title: Schema.string(),
-        executiveSummary: Schema.string({ description: 'El resumen ejecutivo se lo puede encontrar en la sección "Resumen ejecutivo"' }),
-        breach: Schema.string({ description: '¿Cuáles son las brechas de seguridad identificadas en el documento?' }),
+        executiveSummary: Schema.string({ description: 'Resume las brechas de seguridad o vulnerabilidades más significativas identificadas. Describe su naturaleza, impacto y recomendaciones si están disponibles. Indica los dominios, sistemas o funciones donde la organización presenta mayor exposición al riesgo. Justifica por qué son críticos. Identifica qué aspectos deben abordarse primero y explica por qué, en función del nivel de riesgo, impacto o facilidad de mitigación. Proporciona sugerencias claras sobre cómo deben interpretarse y aplicarse los resultados para fortalecer la postura de seguridad. Explica las implicaciones de los resultados en términos de gobernanza, cumplimiento normativo y desarrollo de políticas de ciberseguridad.' }),
+        breach: Schema.string({ description: 'Enumera y describe las principales brechas de seguridad o vulnerabilidades identificadas. Para cada una incluye el tipo, posible impacto y recomendaciones si están presentes.' }),
         result: Schema.object({
           properties: {
-            identify: Schema.object({
+            identificar: Schema.object({
               properties: {
                 description: Schema.string({ description: 'Dentro de la sección "Identify", se encuentra información relacionada con la identificación. ¿Podrías proporcionarme un resumen completo de todo el contenido de esta sección?' }),
                 nivel: Schema.number({ description: '¿Podrías proporcionarme el porcentaje con decimal de cumplimiento en el reporte relacionado con la identificación?' }),
@@ -137,7 +137,7 @@ export class CargarArchivoComponent implements OnInit {
                 noCumple: Schema.number({ description: 'Porcentaje de no cumplimiento en la sección "Identify". Una valoración general sobre las áreas que no cumplen con los estándares de seguridad.' })
               }
             }),
-            protect: Schema.object({
+            proteger: Schema.object({
               properties: {
                 description: Schema.string({ description: 'Dentro de la sección "Protect", se encuentra información relacionada con la protección. ¿Podrías proporcionarme un resumen completo de todo el contenido de esta sección?' }),
                 nivel: Schema.number({ description: '¿Podrías proporcionarme el porcentaje con decimal de cumplimiento en el reporte relacionado con la protección?' }),
@@ -146,7 +146,7 @@ export class CargarArchivoComponent implements OnInit {
                 noCumple: Schema.number({ description: 'Porcentaje de no cumplimiento en la sección "Protect". Una valoración general sobre las áreas que no cumplen con los estándares de seguridad.' })
               }
             }),
-            detect: Schema.object({
+            detectar: Schema.object({
               properties: {
                 description: Schema.string({ description: 'Dentro de la sección "Detect", se aborda información sobre la detección. ¿Podrías proporcionarme un resumen detallado de todo lo que se cubre en esta sección?' }),
                 nivel: Schema.number({ description: '¿Podrías proporcionarme el porcentaje con decimal de cumplimiento en el reporte relacionado con la detección?' }),
@@ -155,7 +155,7 @@ export class CargarArchivoComponent implements OnInit {
                 noCumple: Schema.number({ description: 'Porcentaje de no cumplimiento en la sección "Detect". Una valoración general sobre las áreas que no cumplen con los estándares de seguridad.' })
               }
             }),
-            respond: Schema.object({
+            responder: Schema.object({
               properties: {
                 description: Schema.string({ description: 'En la sección "Respond", se habla sobre cómo responder a incidentes. ¿Podrías proporcionarme un resumen completo de toda la información relevante en esta sección?' }),
                 nivel: Schema.number({ description: '¿Podrías proporcionarme el porcentaje con decimal de cumplimiento en el reporte relacionado con la respuesta?' }),
@@ -164,7 +164,7 @@ export class CargarArchivoComponent implements OnInit {
                 noCumple: Schema.number({ description: 'Porcentaje de no cumplimiento en la sección "Respond". Una valoración general sobre las áreas que no cumplen con los estándares de seguridad.' })
               }
             }),
-            recover: Schema.object({
+            recuperar: Schema.object({
               properties: {
                 description: Schema.string({ description: 'Dentro de la sección "Recover", se exploran las estrategias de recuperación. ¿Podrías proporcionarme un resumen completo de los temas tratados en esta sección?' }),
                 nivel: Schema.number({ description: '¿Podrías proporcionarme el porcentaje con decimal de cumplimiento en el reporte relacionado con la recuperación?' }),
