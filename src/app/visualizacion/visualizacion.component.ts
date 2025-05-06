@@ -3,6 +3,7 @@ import Chart from 'chart.js/auto';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
+//import html2pdf from 'html2pdf.js';
 import { ActivatedRoute } from '@angular/router';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -116,7 +117,7 @@ export class VisualizacionComponent implements OnInit {
   }
 
   loadBarChart() {
-    const identificar = this.analysis.result.result.identify.nivel * 100;    
+    const identify = this.analysis.result.result.identify.nivel * 100;    
     const protect = this.analysis.result.result.protect.nivel * 100;
     const detect = this.analysis.result.result.detect.nivel * 100;
     const respond = this.analysis.result.result.respond.nivel * 100;
@@ -129,7 +130,7 @@ export class VisualizacionComponent implements OnInit {
       datasets: [
         {
         label: 'Cumplimiento (%)',
-        data: [identificar, protect, detect, respond, recover],
+        data: [identify, protect, detect, respond, recover],
         backgroundColor: ['#28a745', '#ffc107', '#007bff', '#dc3545', '#17a2b8']
         }
       ]
@@ -209,8 +210,6 @@ export class VisualizacionComponent implements OnInit {
       return 'fa-info-circle'; // Ícono de alerta baja
     }
   }
-
-
   exportToPDF() {
     const doc = new jsPDF('p', 'mm', 'a4');
      // Captura la pantalla del reporte

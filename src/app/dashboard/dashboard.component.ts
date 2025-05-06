@@ -16,7 +16,7 @@ export class DashboardComponent implements OnInit {
 
   analysisView: AnalysisView[] = [];
 
-  toolInfo: string = 'CyberInterpret analiza archivos de seguridad generados por Feasibility Cybersecurity, detecta riesgos y genera reportes detallados.';
+  toolInfo: string = 'CyberInterpret es una herramienta diseñada para facilitar la interpretación del documento de salida generado por Feasibility Cybersecurity. Su propósito es analizar el archivo y presentar los resultados de forma clara, precisa y comprensible. Además, permite exportar la información interpretada, lo que resulta especialmente útil para personas sin conocimientos técnicos en seguridad informática.';
 
   modulesStatus = [
     { name: 'Carga de Archivos', status: 'Activo', icon: 'upload' },

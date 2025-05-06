@@ -128,7 +128,7 @@ export class CargarArchivoComponent implements OnInit {
         breach: Schema.string({ description: 'Enumera y describe las principales brechas de seguridad o vulnerabilidades identificadas. Para cada una incluye el tipo, posible impacto y recomendaciones si están presentes.' }),
         result: Schema.object({
           properties: {
-            identificar: Schema.object({
+            identify: Schema.object({
               properties: {
                 description: Schema.string({ description: 'Dentro de la sección "Identify", se encuentra información relacionada con la identificación. ¿Podrías proporcionarme un resumen completo de todo el contenido de esta sección?' }),
                 nivel: Schema.number({ description: '¿Podrías proporcionarme el porcentaje con decimal de cumplimiento en el reporte relacionado con la identificación?' }),
@@ -137,7 +137,7 @@ export class CargarArchivoComponent implements OnInit {
                 noCumple: Schema.number({ description: 'Porcentaje de no cumplimiento en la sección "Identify". Una valoración general sobre las áreas que no cumplen con los estándares de seguridad.' })
               }
             }),
-            proteger: Schema.object({
+            protect: Schema.object({
               properties: {
                 description: Schema.string({ description: 'Dentro de la sección "Protect", se encuentra información relacionada con la protección. ¿Podrías proporcionarme un resumen completo de todo el contenido de esta sección?' }),
                 nivel: Schema.number({ description: '¿Podrías proporcionarme el porcentaje con decimal de cumplimiento en el reporte relacionado con la protección?' }),
@@ -146,7 +146,7 @@ export class CargarArchivoComponent implements OnInit {
                 noCumple: Schema.number({ description: 'Porcentaje de no cumplimiento en la sección "Protect". Una valoración general sobre las áreas que no cumplen con los estándares de seguridad.' })
               }
             }),
-            detectar: Schema.object({
+            detect: Schema.object({
               properties: {
                 description: Schema.string({ description: 'Dentro de la sección "Detect", se aborda información sobre la detección. ¿Podrías proporcionarme un resumen detallado de todo lo que se cubre en esta sección?' }),
                 nivel: Schema.number({ description: '¿Podrías proporcionarme el porcentaje con decimal de cumplimiento en el reporte relacionado con la detección?' }),
@@ -155,7 +155,7 @@ export class CargarArchivoComponent implements OnInit {
                 noCumple: Schema.number({ description: 'Porcentaje de no cumplimiento en la sección "Detect". Una valoración general sobre las áreas que no cumplen con los estándares de seguridad.' })
               }
             }),
-            responder: Schema.object({
+            respond: Schema.object({
               properties: {
                 description: Schema.string({ description: 'En la sección "Respond", se habla sobre cómo responder a incidentes. ¿Podrías proporcionarme un resumen completo de toda la información relevante en esta sección?' }),
                 nivel: Schema.number({ description: '¿Podrías proporcionarme el porcentaje con decimal de cumplimiento en el reporte relacionado con la respuesta?' }),
@@ -164,7 +164,7 @@ export class CargarArchivoComponent implements OnInit {
                 noCumple: Schema.number({ description: 'Porcentaje de no cumplimiento en la sección "Respond". Una valoración general sobre las áreas que no cumplen con los estándares de seguridad.' })
               }
             }),
-            recuperar: Schema.object({
+            recover: Schema.object({
               properties: {
                 description: Schema.string({ description: 'Dentro de la sección "Recover", se exploran las estrategias de recuperación. ¿Podrías proporcionarme un resumen completo de los temas tratados en esta sección?' }),
                 nivel: Schema.number({ description: '¿Podrías proporcionarme el porcentaje con decimal de cumplimiento en el reporte relacionado con la recuperación?' }),
