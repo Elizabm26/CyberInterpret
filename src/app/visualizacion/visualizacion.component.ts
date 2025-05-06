@@ -210,44 +210,100 @@ export class VisualizacionComponent implements OnInit {
       return 'fa-info-circle'; // Ícono de alerta baja
     }
   }
+
   exportToPDF() {
-    const doc = new jsPDF('p', 'mm', 'a4');
-     // Captura la pantalla del reporte
-     html2canvas(this.reportContent.nativeElement, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const imgWidth = 190;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let yPos = 20; // Margen superior
-
-      // Agregar título y encabezado
-      doc.setFontSize(18);
-      doc.text('Reporte de Seguridad', 14, yPos);
-      yPos += 10;
-
-      // Agregar imagen del contenido capturado
-      if (imgHeight > 240) {
-        const pageHeight = doc.internal.pageSize.height - 20;
-        let heightLeft = imgHeight;
-
-        while (heightLeft > 0) {
-          doc.addImage(imgData, 'PNG', 10, yPos, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-          yPos = -pageHeight;
-
-          if (heightLeft > 0) {
-            doc.addPage();
-          }
-        }
-      } else {
-        doc.addImage(imgData, 'PNG', 10, yPos, imgWidth, imgHeight);
-      }
-
-      // Pie de página
-      doc.setFontSize(10);
-      doc.text('CyberInterpret - Reporte generado automáticamente', 14, 285);
-
-      // Guardar el PDF
-      doc.save('reporte_seguridad.pdf');
+    // 1) Inicializa el documento
+    const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+    const pw = doc.internal.pageSize.getWidth();
+    const ph = doc.internal.pageSize.getHeight();
+    let y = 20;
+  
+    // 2) Título centrado
+    doc.setFontSize(18);
+    doc.text('Reporte de Seguridad de CyberInterpret', pw / 2, y, { align: 'center' });
+    y += 10;
+  
+    // 3) Metadatos del archivo
+    doc.setFontSize(12);
+    doc.text(`Archivo: ${this.analysis.name}`, 14, y); y += 6;
+    doc.text(`Fecha: ${new Date(this.analysis.createdAt).toLocaleString()}`, 14, y); y += 6;
+    doc.text(`Tamaño: ${(this.analysis.size / 1024 / 1024).toFixed(2)} MB`, 14, y); y += 10;
+  
+    // 4) Executive Summary justificado
+    const resumen = this.analysis.result.executiveSummary;
+    doc.setFontSize(11);
+    doc.text(resumen, 14, y, {
+      maxWidth: pw - 28,
+      align: 'justify'
     });
+    // calcula cuántas líneas ocupó
+    const resumenLines = doc.splitTextToSize(resumen, pw - 28).length;
+    y += resumenLines * 6 + 5;
+  
+    // 5) Descripción del estado general justificada
+    const desc = this.analysis.result.result.estadoGeneral.generalDescription;
+    doc.setFontSize(11);
+    doc.text('Descripción Estado General:', 14, y); y += 6;
+    doc.text(desc, 14, y, {
+      maxWidth: pw - 28,
+      align: 'justify'
+    });
+    const descLinesCount = doc.splitTextToSize(desc, pw - 28).length;
+    y += descLinesCount * 6 + 10;
+  
+
+    // 6) Gráficos al 50% de ancho, altura 60mm
+    const chartHeight = 60;
+    const contentWidth = pw - 28;
+    const imgW = contentWidth * 0.5;
+    const canvases: HTMLCanvasElement[] = [
+      this.barChart.nativeElement,
+      this.pieChart.nativeElement
+    ];
+    canvases.forEach(canvas => {
+      if (y + chartHeight > ph - 20) {
+        doc.addPage(); y = 20;
+      }
+      const imgData = canvas.toDataURL('image/png');
+      const x = 14 + (contentWidth - imgW) / 2;
+      doc.addImage(imgData, 'PNG', x, y, imgW, chartHeight);
+      y += chartHeight + 8;
+    });
+  
+    // 7) Tabla de alertas y recomendaciones al final
+    const { alertas, recomendaciones } = this.analysis.result.result.alertasYRecomendaciones;
+    if (y + 40 > ph - 20) {  // asegurar espacio mínimo
+      doc.addPage(); y = 20;
+    }
+    (doc as any).autoTable({
+      startY: y,
+      head: [['Tipo', 'Detalle']],
+      body: [
+        ...alertas.map(a => ['Alerta', a]),
+        ...recomendaciones.map(r => ['Recomendación', r])
+      ],
+      margin: { left: 14, right: 14 },
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [41, 128, 185] }
+    });
+    y = (doc as any).lastAutoTable.finalY + 8;
+  
+    // 8) Pie de página en cada página
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(
+        `CyberInterpret – Página ${i} de ${pageCount}`,
+        pw - 14,
+        ph - 10,
+        { align: 'right' }
+      );
+    }
+  
+    // 9) Guardar
+    doc.save('reporte_seguridad.pdf');
   }
+  
+  
 }
