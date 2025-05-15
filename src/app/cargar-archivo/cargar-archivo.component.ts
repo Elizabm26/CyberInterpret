@@ -124,8 +124,8 @@ export class CargarArchivoComponent implements OnInit {
     const jsonSchema = Schema.object({
       properties: {
         title: Schema.string(),
-        executiveSummary: Schema.string({ description: 'El resumen ejecutivo se lo puede encontrar en la sección "Resumen ejecutivo"' }),
-        breach: Schema.string({ description: '¿Cuáles son las brechas de seguridad identificadas en el documento?' }),
+        executiveSummary: Schema.string({ description: 'Resume las brechas de seguridad o vulnerabilidades más significativas identificadas. Describe su naturaleza, impacto y recomendaciones si están disponibles. Indica los dominios, sistemas o funciones donde la organización presenta mayor exposición al riesgo. Justifica por qué son críticos. Identifica qué aspectos deben abordarse primero y explica por qué, en función del nivel de riesgo, impacto o facilidad de mitigación. Proporciona sugerencias claras sobre cómo deben interpretarse y aplicarse los resultados para fortalecer la postura de seguridad. Explica las implicaciones de los resultados en términos de gobernanza, cumplimiento normativo y desarrollo de políticas de ciberseguridad.' }),
+        breach: Schema.string({ description: 'Enumera y describe las principales brechas de seguridad o vulnerabilidades identificadas. Para cada una incluye el tipo, posible impacto y recomendaciones si están presentes.' }),
         result: Schema.object({
           properties: {
             identify: Schema.object({
@@ -177,7 +177,8 @@ export class CargarArchivoComponent implements OnInit {
               properties: {
                 cumple: Schema.number({ description: 'Porcentaje de cumplimiento en el reporte', example: '0.1' }),
                 parcial: Schema.number({ description: 'Porcentaje de cumplimiento parcial en el reporte', example: '0.2' }),
-                noCumple: Schema.number({ description: 'Porcentaje de no cumplimiento en el reporte', example: '0.3' })
+                noCumple: Schema.number({ description: 'Porcentaje de no cumplimiento en el reporte', example: '0.3' }),
+                generalDescription: Schema.string({ description: 'Proporciona un resumen claro y conciso sobre el estado general del reporte. Clasifica la información en tres niveles: Se cumple (altos niveles de cumplimiento), Parcialmente (cumplimiento moderado o en proceso) y No se cumple (bajo cumplimiento o ausencia de requisitos). Destaca los aspectos más relevantes y proporciona una visión general sobre las áreas con mejor desempeño y aquellas que requieren atención. Además, detalla el nivel de cumplimiento por cada categoría evaluada, indicando específicamente en qué nivel se encuentra cada una y proporcionando breves observaciones que justifiquen su clasificación.' })
               }
             }),
             alertasYRecomendaciones: Schema.object({

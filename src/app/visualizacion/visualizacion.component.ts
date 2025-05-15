@@ -111,6 +111,7 @@ export class VisualizacionComponent implements OnInit {
         this.analysis = doc.data() as any;
         this.loadBarChart();
         this.loadPieChart();
+       // this.loadStackedBarChart();
 
       }
     })
@@ -158,6 +159,67 @@ export class VisualizacionComponent implements OnInit {
       plugins: [ChartDataLabels] // Agregar el plugin para mostrar los valores
     });
   }
+  loadStackedBarChart() {
+  const data = {
+    labels: ['Identificar', 'Proteger', 'Detectar', 'Responder', 'Recuperar'],
+    datasets: [
+      {
+        label: 'Cumple',
+        data: [30, 40, 35, 20, 25],
+        backgroundColor: '#28a745'
+      },
+      {
+        label: 'Parcial',
+        data: [40, 30, 35, 50, 45],
+        backgroundColor: '#ffc107'
+      },
+      {
+        label: 'No Cumple',
+        data: [30, 30, 30, 30, 30],
+        backgroundColor: '#dc3545'
+      }
+    ]
+  };
+
+  new Chart(this.barChart.nativeElement, {
+    type: 'bar',
+    data: data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const value = context.parsed.x;
+              return `${context.dataset.label}: ${value}%`;
+            }
+          }
+        },
+        legend: { position: 'top' },
+        datalabels: {
+          formatter: (value) => `${value}%`,
+          color: '#fff',
+          font: {
+            weight: 'bold'
+          }
+        }
+      },
+      indexAxis: 'y',
+      scales: {
+        x: {
+          stacked: true,
+          max: 100,
+          ticks: { callback: value => `${value}%` }
+        },
+        y: {
+          stacked: true
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
 
   loadPieChart() {
     const cumple = this.analysis.result.result.estadoGeneral.cumple * 100;
@@ -183,11 +245,26 @@ export class VisualizacionComponent implements OnInit {
           legend: { position: 'bottom' },
           tooltip: {
             callbacks: {
-              afterBody: () => [`Descripción: ${generalDescription}`]
+              label: (context) =>{
+                const label = context.label || '';
+                const value = Math.round(context.parsed);
+                return `${label}: ${value}%`;
+
+              }
+             // afterBody: () => [`Descripción: ${generalDescription}`]
+            }
+          },
+          datalabels: {
+            color: '#000', // Color de los números
+            formatter: (value) => `${Math.round(value)}%`, // Formato del número
+            font: {
+              weight: 'bold',
+              size: 14
             }
           }
         }
-      }
+      },
+      plugins: [ChartDataLabels] // Agregar el plugin para mostrar los valores
     });
   }
 
@@ -279,7 +356,7 @@ export class VisualizacionComponent implements OnInit {
       startY: y,
       head: [['Tipo', 'Detalle']],
       body: [
-        ...alertas.map(a => ['Alerta', a]),
+        ...alertas.map(a => ['Alerta Críticas', a]),
         ...recomendaciones.map(r => ['Recomendación', r])
       ],
       margin: { left: 14, right: 14 },
