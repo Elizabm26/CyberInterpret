@@ -109,9 +109,9 @@ export class VisualizacionComponent implements OnInit {
       if (doc.exists()) {
         console.log(doc.data());
         this.analysis = doc.data() as any;
-        this.loadBarChart();
+        //this.loadBarChart();
         this.loadPieChart();
-       // this.loadStackedBarChart();
+        this.loadStackedBarChart();
 
       }
     })
@@ -159,67 +159,78 @@ export class VisualizacionComponent implements OnInit {
       plugins: [ChartDataLabels] // Agregar el plugin para mostrar los valores
     });
   }
-  loadStackedBarChart() {
-  const data = {
-    labels: ['Identificar', 'Proteger', 'Detectar', 'Responder', 'Recuperar'],
-    datasets: [
-      {
-        label: 'Cumple',
-        data: [30, 40, 35, 20, 25],
-        backgroundColor: '#28a745'
-      },
-      {
-        label: 'Parcial',
-        data: [40, 30, 35, 50, 45],
-        backgroundColor: '#ffc107'
-      },
-      {
-        label: 'No Cumple',
-        data: [30, 30, 30, 30, 30],
-        backgroundColor: '#dc3545'
-      }
-    ]
-  };
+loadStackedBarChart() {
+type CategoryKey = 'identify' | 'protect' | 'detect' | 'respond' | 'recover';
+const categories: CategoryKey[] = ['identify', 'protect', 'detect', 'respond', 'recover'];
+const labels = ['Identificar', 'Proteger', 'Detectar', 'Responder', 'Recuperar'];
+
+// Obtener datos por nivel de cumplimiento
+const cumple = categories.map(cat => this.analysis.result.result[cat].cumple * 100);
+const parcial = categories.map(cat => this.analysis.result.result[cat].parcial * 100);
+const noCumple = categories.map(cat => this.analysis.result.result[cat].noCumple * 100);
 
   new Chart(this.barChart.nativeElement, {
     type: 'bar',
-    data: data,
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Cumple',
+          data: cumple,
+          backgroundColor: '#28a745'
+        },
+        {
+          label: 'Parcial',
+          data: parcial,
+          backgroundColor: '#ffc107'
+        },
+        {
+          label: 'No Cumple',
+          data: noCumple,
+          backgroundColor: '#dc3545'
+        }
+      ]
+    },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        tooltip: {
-          callbacks: {
-            label: (context) => {
-              const value = context.parsed.x;
-              return `${context.dataset.label}: ${value}%`;
-            }
-          }
+        legend: {
+          position: 'top'
         },
-        legend: { position: 'top' },
         datalabels: {
-          formatter: (value) => `${value}%`,
           color: '#fff',
+          anchor: 'center',
+          align: 'center',
           font: {
             weight: 'bold'
+          },
+          formatter: (value) => `${value.toFixed(0)}%`
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => `${context.dataset.label}: ${context.parsed.toFixed(0)}%`
           }
         }
       },
-      indexAxis: 'y',
       scales: {
-        x: {
-          stacked: true,
-          max: 100,
-          ticks: { callback: value => `${value}%` }
-        },
+        x: { stacked: true },
         y: {
-          stacked: true
+          stacked: true,
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            callback: (value) => `${value}%`
+          }
         }
       }
     },
     plugins: [ChartDataLabels]
   });
 }
+
+
+
 
   loadPieChart() {
     const cumple = this.analysis.result.result.estadoGeneral.cumple * 100;
@@ -288,99 +299,121 @@ export class VisualizacionComponent implements OnInit {
     }
   }
 
-  exportToPDF() {
-    // 1) Inicializa el documento
-    const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
-    const pw = doc.internal.pageSize.getWidth();
-    const ph = doc.internal.pageSize.getHeight();
-    let y = 20;
-  
-    // 2) Título centrado
-    doc.setFontSize(18);
-    doc.text('Reporte de Seguridad de CyberInterpret', pw / 2, y, { align: 'center' });
-    y += 10;
-  
-    // 3) Metadatos del archivo
-    doc.setFontSize(12);
-    doc.text(`Archivo: ${this.analysis.name}`, 14, y); y += 6;
-    doc.text(`Fecha: ${new Date(this.analysis.createdAt).toLocaleString()}`, 14, y); y += 6;
-    doc.text(`Tamaño: ${(this.analysis.size / 1024 / 1024).toFixed(2)} MB`, 14, y); y += 10;
-  
-    // 4) Executive Summary justificado
-    const resumen = this.analysis.result.executiveSummary;
-    doc.setFontSize(11);
-    doc.text(resumen, 14, y, {
-      maxWidth: pw - 28,
-      align: 'justify'
-    });
-    // calcula cuántas líneas ocupó
-    const resumenLines = doc.splitTextToSize(resumen, pw - 28).length;
-    y += resumenLines * 6 + 5;
-  
-    // 5) Descripción del estado general justificada
-    const desc = this.analysis.result.result.estadoGeneral.generalDescription;
-    doc.setFontSize(11);
-    doc.text('Descripción Estado General:', 14, y); y += 6;
-    doc.text(desc, 14, y, {
-      maxWidth: pw - 28,
-      align: 'justify'
-    });
-    const descLinesCount = doc.splitTextToSize(desc, pw - 28).length;
-    y += descLinesCount * 6 + 10;
-  
+exportToPDF() {
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+  const pw = doc.internal.pageSize.getWidth();
+  const ph = doc.internal.pageSize.getHeight();
+  let y = 20;
 
-    // 6) Gráficos al 50% de ancho, altura 60mm
-    const chartHeight = 60;
-    const contentWidth = pw - 28;
-    const imgW = contentWidth * 0.5;
-    const canvases: HTMLCanvasElement[] = [
-      this.barChart.nativeElement,
-      this.pieChart.nativeElement
-    ];
-    canvases.forEach(canvas => {
-      if (y + chartHeight > ph - 20) {
-        doc.addPage(); y = 20;
-      }
-      const imgData = canvas.toDataURL('image/png');
-      const x = 14 + (contentWidth - imgW) / 2;
-      doc.addImage(imgData, 'PNG', x, y, imgW, chartHeight);
-      y += chartHeight + 8;
-    });
-  
-    // 7) Tabla de alertas y recomendaciones al final
-    const { alertas, recomendaciones } = this.analysis.result.result.alertasYRecomendaciones;
-    if (y + 40 > ph - 20) {  // asegurar espacio mínimo
-      doc.addPage(); y = 20;
-    }
-    (doc as any).autoTable({
-      startY: y,
-      head: [['Tipo', 'Detalle']],
-      body: [
-        ...alertas.map(a => ['Alerta Críticas', a]),
-        ...recomendaciones.map(r => ['Recomendación', r])
-      ],
-      margin: { left: 14, right: 14 },
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [41, 128, 185] }
-    });
-    y = (doc as any).lastAutoTable.finalY + 8;
-  
-    // 8) Pie de página en cada página
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.text(
-        `CyberInterpret – Página ${i} de ${pageCount}`,
-        pw - 14,
-        ph - 10,
-        { align: 'right' }
-      );
-    }
-  
-    // 9) Guardar
-    doc.save('reporte_seguridad.pdf');
+  // Función para limpiar texto
+  function limpiarTexto(texto: string): string {
+    return texto
+      .replace(/\s+/g, ' ')      // Reemplaza múltiples espacios/tabulaciones/saltos por un solo espacio
+      .replace(/ ?\n ?/g, '\n')  // Mantiene saltos de línea limpios
+      .trim();
   }
+
+  const marginX = 14;
+  const maxWidth = pw - marginX * 2;
+  const lineHeight = 6;
+
+  // 2) Título centrado
+  doc.setFontSize(18);
+  doc.text('Reporte de Seguridad de CyberInterpret', pw / 2, y, { align: 'center' });
+  y += 10;
+
+  // 3) Metadatos del archivo
+  doc.setFontSize(12);
+  doc.text(`Archivo: ${this.analysis.name}`, marginX, y); y += 6;
+  doc.text(`Fecha: ${new Date(this.analysis.createdAt).toLocaleString()}`, marginX, y); y += 6;
+  doc.text(`Tamaño: ${(this.analysis.size / 1024 / 1024).toFixed(2)} MB`, marginX, y); y += 10;
+
+  // Función para agregar texto dividido y ajustado verticalmente
+  const agregarTexto = (titulo: string, contenido: string) => {
+    // Título
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    if (y + lineHeight > ph - 20) { doc.addPage(); y = 20; }
+    doc.text(titulo, marginX, y);
+    y += lineHeight;
+
+    // Contenido
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    const lines = doc.splitTextToSize(limpiarTexto(contenido), maxWidth);
+    for (const line of lines) {
+      if (y + lineHeight > ph - 20) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(line, marginX, y);
+      y += lineHeight;
+    }
+    y += 4;
+  };
+
+  // 4) Resumen del Análisis
+  agregarTexto('Resumen del Análisis:', this.analysis.result.executiveSummary);
+
+  // 5) Descripción del Estado General
+  agregarTexto('Descripción del Estado General:', this.analysis.result.result.estadoGeneral.generalDescription);
+
+  // 6) Gráficos
+  const chartHeight = 60;
+  const contentWidth = pw - 28;
+  const imgW = contentWidth * 0.5;
+  const chartTitles = ['Cumplimiento por Categoría', 'Estado General'];
+  const canvases: HTMLCanvasElement[] = [
+    this.barChart.nativeElement,
+    this.pieChart.nativeElement
+  ];
+
+  canvases.forEach((canvas, index) => {
+    if (y + chartHeight + 10 > ph - 20) {
+      doc.addPage();
+      y = 20;
+    }
+
+    const title = chartTitles[index];
+    const textWidth = doc.getTextWidth(title);
+    const titleX = (pw - textWidth) / 2;
+    doc.setFontSize(12);
+    doc.text(title, titleX, y);
+    y += 6;
+
+    const imgData = canvas.toDataURL('image/png');
+    const x = 14 + (contentWidth - imgW) / 2;
+    doc.addImage(imgData, 'PNG', x, y, imgW, chartHeight);
+    y += chartHeight + 8;
+  });
+
+  // 7) Tabla de alertas y recomendaciones
+  const { alertas, recomendaciones } = this.analysis.result.result.alertasYRecomendaciones;
+  if (y + 40 > ph - 20) { doc.addPage(); y = 20; }
+  (doc as any).autoTable({
+    startY: y,
+    head: [['Tipo', 'Detalle']],
+    body: [
+      ...alertas.map(a => ['Alerta Crítica', a]),
+      ...recomendaciones.map(r => ['Recomendación', r])
+    ],
+    margin: { left: 14, right: 14 },
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [41, 128, 185] }
+  });
+  y = (doc as any).lastAutoTable.finalY + 8;
+
+  // 8) Pie de página en cada página
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(10);
+    doc.text(`CyberInterpret – Página ${i} de ${pageCount}`, pw - 14, ph - 10, { align: 'right' });
+  }
+
+  // 9) Guardar
+  doc.save('reporte_seguridad.pdf');
+}
   
   
 }
